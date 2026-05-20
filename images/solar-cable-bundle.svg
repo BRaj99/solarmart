@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#163b67"/><stop offset="1" stop-color="#FF8A00"/></linearGradient></defs>
+  <rect width="800" height="600" rx="48" fill="url(#g)"/>
+  <circle cx="655" cy="115" r="62" fill="#FDB813" opacity=".9"/>
+  <g transform="translate(120 180) skewY(-8)">
+    <rect width="430" height="250" rx="24" fill="#153B63" stroke="rgba(255,255,255,.65)" stroke-width="8"/>
+    <path d="M107 0v250M214 0v250M321 0v250M0 83h430M0 166h430" stroke="rgba(255,255,255,.35)" stroke-width="5"/>
+  </g>
+  <rect x="95" y="470" width="610" height="68" rx="24" fill="rgba(255,255,255,.88)"/>
+  <text x="400" y="515" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#0F3324">Solar Cable</text>
+</svg>
