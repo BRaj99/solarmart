@@ -1296,3 +1296,66 @@ footer .copyright {
         right: 62px;
     }
 }
+
+/* Customer account order history */
+.customer-account-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.profile-card-box p {
+    margin: 10px 0;
+    color: var(--muted);
+}
+
+.order-history-card {
+    overflow: hidden;
+}
+
+.section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.order-status {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+}
+
+.order-status.pending {
+    background: var(--sun-dark);
+}
+
+.order-status.processing {
+    background: #2563eb;
+}
+
+.order-status.delivered {
+    background: var(--solar-green);
+}
+
+.order-status.cancelled {
+    background: var(--danger);
+}
+
+@media (max-width: 900px) {
+    .customer-account-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
