@@ -15,6 +15,11 @@ $error = "";
 $registerError = "";
 $registerSuccess = "";
 $showSignup = false;
+$next = $_GET["next"] ?? ($_POST["next"] ?? "index.php");
+$allowedNext = ["checkout.php", "cart.php", "index.php", "shop.php"];
+if (!in_array($next, $allowedNext)) { $next = "index.php"; }
+$loginNotice = $_SESSION["login_notice"] ?? "";
+unset($_SESSION["login_notice"]);
 
 /* LOGIN */
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
@@ -41,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             $_SESSION['user_location'] = $user['location'];
             $_SESSION['user_address'] = $user['address'];
 
-            header("Location: index.php");
+            header("Location: " . $next);
             exit();
 
         } else {
@@ -184,7 +189,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
 
         <!-- LOGIN FORM -->
 
-        <form
+        <?php if (!empty($loginNotice)): ?><p class="success-alert"><?php echo htmlspecialchars($loginNotice); ?></p><?php endif; ?>
+<form
             id="loginForm"
             class="card form-stack login-card <?php echo $showSignup ? 'hidden' : ''; ?>"
             method="POST"
@@ -267,7 +273,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
                 Sign Up
             </button>
 
-        </form>
+        <input type="hidden" name="next" value="<?php echo htmlspecialchars($next); ?>">
+</form>
 
         <!-- SIGNUP FORM -->
 
@@ -388,7 +395,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
 
 </section>
 
-<script src="script.js"></script>
+<script src="script.js?v=checkout-cart-fix-2"></script>
 
 <script>
 

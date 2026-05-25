@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "db.php";
+$isLoggedIn = isset($_SESSION["user_id"]);
 
 $productRows = [];
 $productResult = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products WHERE stock > 0 ORDER BY id DESC");
@@ -39,15 +40,20 @@ if ($productResult) {
     </section>
     <section class="page-header"><h1>Your Cart</h1><p>Review quantities and totals before checkout.</p></section>
     <section class="section-p1">
-        <div class="table-wrap"><table class="cart-table">
-            <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Remove</th></tr></thead>
-            <tbody id="cartBody"></tbody>
-        </table></div>
-        <div id="cartSummary" class="card cart-summary"></div>
+        <div class="cart-page-shell">
+            <div class="cart-items-panel">
+                <table class="cart-table">
+                    <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Remove</th></tr></thead>
+                    <tbody id="cartBody"></tbody>
+                </table>
+            </div>
+            <div id="cartSummary" class="card cart-summary"></div>
+        </div>
     </section>
     <script>
         window.SOLAR_PRODUCTS = <?php echo json_encode($productRows, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        window.SOLAR_IS_LOGGED_IN = <?php echo $isLoggedIn ? "true" : "false"; ?>;
     </script>
-    <script src="script.js"></script>
+    <script src="script.js?v=checkout-cart-fix-2"></script>
 </body>
 </html>
