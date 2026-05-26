@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "db.php";
+include "mail_helper.php";
 
 if (!isset($_SESSION["user_id"])) {
     $_SESSION["login_notice"] = "Please login before purchasing items.";
@@ -91,12 +92,7 @@ function buildInvoiceHtml($orderNumber, $customerName, $customerEmail, $customer
 }
 
 function sendInvoiceEmail($to, $customerName, $orderNumber, $invoiceHtml) {
-    $subject = "SolarMart Invoice - " . $orderNumber;
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8\r\n";
-    $headers .= "From: SolarMart <no-reply@solarmart.local>\r\n";
-    $body = "<p>Dear " . htmlspecialchars($customerName) . ",</p><p>Your order has been placed successfully. Your invoice is below.</p>" . $invoiceHtml;
-    return mail($to, $subject, $body, $headers);
+    return sendInvoicePdfEmail($to, $customerName, $orderNumber, $invoiceHtml);
 }
 
 $userId = (int)$_SESSION["user_id"];
@@ -176,9 +172,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             mysqli_commit($conn);
 
             $message = "Order placed successfully. Your order number is " . $orderNumber . ".";
-            $emailStatus = sendInvoiceEmail($customerEmail, $customerName, $orderNumber, $invoiceHtml)
-                ? "Invoice sent to your registered email: " . $customerEmail
-                : "Order saved, but email was not sent. On localhost, configure SMTP or use PHPMailer to send email.";
+            try {
+                sendInvoiceEmail($customerEmail, $customerName, $orderNumber, $invoiceHtml);
+                $emailStatus = "Invoice PDF sent to your registered email: " . $customerEmail;
+            } catch (Exception $mailError) {
+                $emailStatus = "Order saved, but invoice email was not sent. " . $mailError->getMessage();
+            }
         } catch (Exception $e) {
             mysqli_rollback($conn);
             $error = $e->getMessage();
