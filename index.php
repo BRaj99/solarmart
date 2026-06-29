@@ -256,7 +256,7 @@ function e($value) {
         <?php if (isset($_SESSION['user_id'])) { ?>
             <a href="profile.php">My Profile</a>
             <a href="cart.php">View Cart</a>
-            <a href="logout.php">Logout</a>
+            <a href="login.php?logout=true">Logout</a>
         <?php } else { ?>
             <a href="login.php">Sign In</a>
             <a href="cart.php">View Cart</a>

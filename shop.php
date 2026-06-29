@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "site_common.php";
 include "db.php";
 
 $productRows = [];
@@ -38,7 +38,12 @@ if ($productResult) {
             <li><a href="blog.php">Blog</a></li>
             <li><a href="about.php">About</a></li>
             <li><a href="contact.php">Contact</a></li>
+            <?php if (isset($_SESSION['user_id'])): ?>
+            <li><a href="profile.php"><i class="fa-solid fa-user"></i> My Account</a></li>
+            <li><a href="login.php?logout=true">Logout</a></li>
+            <?php else: ?>
             <li><a href="login.php">Login</a></li>
+            <?php endif; ?>
             <li id="lg-bag"><a href="cart.php"><i class="fa-solid fa-bag-shopping"></i><span class="cart-count">0</span></a></li>
             <a href="#" id="close"><i class="fa fa-times"></i></a>
         </ul>
