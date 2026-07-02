@@ -1,15 +1,4 @@
-const fallbackProducts = [
-  { id: 1, name: 'Mono Solar Panel 550W', brand: 'SunPeak', category: 'Panels', price: 28500, stock: 18, image: 'images/mono-solar-panel.svg', desc: 'High efficiency mono panel for home and commercial rooftop systems.' },
-  { id: 2, name: 'Hybrid Solar Inverter 5kW', brand: 'VoltEdge', category: 'Inverters', price: 125000, stock: 7, image: 'images/hybrid-solar-inverter.svg', desc: 'Smart hybrid inverter with battery support and LCD monitoring.' },
-  { id: 3, name: 'Lithium Battery 48V 100Ah', brand: 'PowerCell', category: 'Batteries', price: 185000, stock: 5, image: 'images/lithium-battery.svg', desc: 'Long-life lithium storage for backup and off-grid power.' },
-  { id: 4, name: 'Solar Street Light 120W', brand: 'BrightWay', category: 'Lights', price: 24500, stock: 24, image: 'images/solar-street-light.svg', desc: 'Automatic dusk-to-dawn outdoor lighting with motion sensor.' },
-  { id: 5, name: 'Solar Charge Controller MPPT', brand: 'ChargePro', category: 'Accessories', price: 16500, stock: 14, image: 'images/solar-charge-controller.svg', desc: 'MPPT controller to improve charging efficiency and battery safety.' },
-  { id: 6, name: 'Solar Water Pump Kit', brand: 'AquaSun', category: 'Kits', price: 92000, stock: 6, image: 'images/solar-water-pump-kit.svg', desc: 'Reliable irrigation and water supply kit powered directly by sunlight.' },
-  { id: 7, name: 'Home Solar Kit 3kW', brand: 'EcoHome', category: 'Kits', price: 275000, stock: 4, image: 'images/home-solar-kit.svg', desc: 'Complete rooftop package for small family homes.' },
-  { id: 8, name: 'Solar Cable 6mm Bundle', brand: 'SafeWire', category: 'Accessories', price: 8500, stock: 40, image: 'images/solar-cable-bundle.svg', desc: 'UV-resistant solar cable bundle for safer installation.' }
-];
-
-const products = Array.isArray(window.SOLAR_PRODUCTS) && window.SOLAR_PRODUCTS.length ? window.SOLAR_PRODUCTS : fallbackProducts;
+const products = Array.isArray(window.SOLAR_PRODUCTS) ? window.SOLAR_PRODUCTS : [];
 const orders = [
   { id: 'ORD-1001', customer: 'Aarav Shrestha', total: 153500, status: 'Processing' },
   { id: 'ORD-1002', customer: 'Nisha Gurung', total: 28500, status: 'Delivered' },
@@ -85,19 +74,24 @@ function addToCart(id, qty = 1) {
 }
 
 function productCard(product) {
-  const description = escapeHtml(product.desc || 'Product description will be updated soon.');
+  const description = escapeHtml(product.desc || product.description || 'Product description will be updated soon.');
   const shortDescription = description.length > 120 ? description.slice(0, 120) + '...' : description;
   const productUrl = `product.php?id=${Number(product.id)}`;
+  const image = escapeHtml(product.image || 'images/solar-placeholder.svg');
 
-  return `<div class="pro product-clickable" data-category="${escapeHtml(product.category)}" data-url="${productUrl}" role="link" tabindex="0">
-    <div class="product-img"><img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy"></div>
-    <div class="des">
-      <span>${escapeHtml(product.brand)} • ${escapeHtml(product.category)}</span>
-      <h5>${escapeHtml(product.name)}</h5>
-      <p class="product-card-description">${shortDescription}</p>
-      <h4>${formatRs(product.price)}</h4>
-      <a class="view-details-btn" href="${productUrl}">View Full Description</a>
-    </div>
+  return `<div class="pro" data-category="${escapeHtml(product.category)}">
+    <a href="${productUrl}" class="product-card-link" aria-label="View ${escapeHtml(product.name || 'product')} details">
+      <div class="product-img">
+        <img src="${image}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy">
+      </div>
+      <div class="des">
+        <span>${escapeHtml(product.brand)} • ${escapeHtml(product.category)}</span>
+        <h5>${escapeHtml(product.name)}</h5>
+        <p class="product-card-description">${shortDescription}</p>
+        <h4>${formatRs(product.price)}</h4>
+        <strong class="view-details-btn">View Full Description</strong>
+      </div>
+    </a>
     <button class="cart add-cart" data-id="${Number(product.id)}" aria-label="Add to cart"><i class="fa-solid fa-cart-shopping"></i></button>
   </div>`;
 }
@@ -253,18 +247,11 @@ document.addEventListener('click', e => {
   }
 
   const productCard = e.target.closest('.product-clickable');
-  if (productCard && productCard.dataset.url && !e.target.closest('a') && !e.target.closest('button')) {
+  if (productCard && productCard.dataset.url && !e.target.closest('a')) {
     window.location.href = productCard.dataset.url;
   }
 });
 
-document.addEventListener('keydown', e => {
-  const productCard = e.target.closest('.product-clickable');
-  if (productCard && productCard.dataset.url && (e.key === 'Enter' || e.key === ' ')) {
-    e.preventDefault();
-    window.location.href = productCard.dataset.url;
-  }
-});
 
 document.addEventListener('submit', e => {
   const form = e.target.closest('#checkoutForm');

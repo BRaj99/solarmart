@@ -2718,24 +2718,22 @@ button:disabled {
     }
 }
 
+/* Product detail link fixes */
+.product-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+.product-card-link:hover h5,
 .view-details-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 10px;
-    padding: 9px 14px;
-    border-radius: 999px;
-    background: rgba(34, 139, 80, .12);
     color: var(--solar-green);
-    font-weight: 800;
 }
-
-.view-details-btn:hover {
-    background: var(--solar-green);
-    color: #fff;
+.product-card-description {
+    color: #66756D;
+    line-height: 1.5;
+    min-height: 44px;
 }
-
-.product-detail-info .product-description-box p {
-    font-size: 17px;
-    line-height: 1.9;
+.product-description-box p {
+    white-space: normal;
+    line-height: 1.8;
 }

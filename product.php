@@ -6,20 +6,44 @@ $id = (int)($_GET["id"] ?? 0);
 $product = null;
 
 if ($id > 0) {
-    $stmt = mysqli_prepare($conn, "SELECT * FROM products WHERE id = ? LIMIT 1");
+    $stmt = mysqli_prepare($conn, "SELECT id, name, brand, category, price, stock, sku, image, description FROM products WHERE id = ? LIMIT 1");
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $product = mysqli_fetch_assoc($result);
+    $product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 }
 
 if (!$product) {
     http_response_code(404);
 }
 
+function productImagePath($image) {
+    $image = trim((string)$image);
+    if ($image === "") return "images/solar-placeholder.svg";
+    if (preg_match('/^https?:\/\//i', $image)) return $image;
+    if (strpos($image, "images/") === 0) return $image;
+    return "images/" . $image;
+}
+
 $description = trim($product["description"] ?? "");
 if ($description === "" && $product) {
-    $description = "This solar product is selected for reliable daily performance, energy saving, and long-term use. Contact SolarMart for installation support, warranty information, and product recommendations.";
+    $description = "Product description is not available yet. Please contact SolarMart for technical details, warranty information, and installation support.";
+}
+
+$productRows = [];
+$result = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products WHERE stock > 0 ORDER BY id DESC");
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $productRows[] = [
+            "id" => (int)$row["id"],
+            "name" => $row["name"],
+            "brand" => $row["brand"],
+            "category" => $row["category"],
+            "price" => (float)$row["price"],
+            "stock" => (int)$row["stock"],
+            "image" => productImagePath($row["image"]),
+            "desc" => $row["description"]
+        ];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -38,7 +62,7 @@ if ($description === "" && $product) {
 <?php if ($product): ?>
 <section class="section-p1 product-detail">
     <div class="product-detail-image">
-        <img src="<?php echo e($product["image"]); ?>" alt="<?php echo e($product["name"]); ?>">
+        <img src="<?php echo e(productImagePath($product["image"])); ?>" alt="<?php echo e($product["name"]); ?>">
     </div>
 
     <div class="product-detail-info">
@@ -52,7 +76,7 @@ if ($description === "" && $product) {
         </div>
 
         <div class="product-meta">
-            <?php if (!empty($product["sku"])): ?><p><strong>SKU:</strong> <?php echo e($product["sku"]); ?></p><?php endif; ?>
+            <p><strong>SKU:</strong> <?php echo e($product["sku"]); ?></p>
             <p><strong>Stock:</strong> <?php echo (int)$product["stock"]; ?> available</p>
         </div>
 
@@ -77,25 +101,7 @@ if ($description === "" && $product) {
 <?php renderFooter(); ?>
 
 <script>
-window.SOLAR_PRODUCTS = <?php
-$rows = [];
-$result = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products WHERE stock > 0 ORDER BY id DESC");
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $rows[] = [
-            "id" => (int)$row["id"],
-            "name" => $row["name"],
-            "brand" => $row["brand"],
-            "category" => $row["category"],
-            "price" => (float)$row["price"],
-            "stock" => (int)$row["stock"],
-            "image" => $row["image"],
-            "desc" => $row["description"]
-        ];
-    }
-}
-echo json_encode($rows, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-?>;
+window.SOLAR_PRODUCTS = <?php echo json_encode($productRows, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 </script>
 <script src="script.js"></script>
 </body>

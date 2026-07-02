@@ -27,9 +27,7 @@ function renderHeader($current = '') {
             <li><a<?php echo navActive('about', $current); ?> href="about.php">About</a></li>
             <li><a<?php echo navActive('contact', $current); ?> href="contact.php">Contact</a></li>
 
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <li><a href="login.php?logout=true">Logout</a></li>
-            <?php else: ?>
+            <?php if (!isset($_SESSION['user_id'])): ?>
                 <li><a href="login.php">Login</a></li>
             <?php endif; ?>
 
@@ -40,6 +38,32 @@ function renderHeader($current = '') {
                 </a>
             </li>
 
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li class="profile-menu-wrap">
+                    <button type="button" class="profile-icon profile-toggle" aria-label="Open profile" aria-expanded="false">
+                        <i class="fa-solid fa-user"></i>
+                    </button>
+                    <div class="profile-livebar">
+                        <div class="profile-livebar-head">
+                            <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+                            <div>
+                                <h4><?php echo e($_SESSION['user_name'] ?? 'Customer'); ?></h4>
+                                <p><?php echo e($_SESSION['user_email'] ?? ''); ?></p>
+                            </div>
+                        </div>
+                        <div class="profile-livebar-info">
+                            <p><i class="fa-solid fa-phone"></i> <?php echo e($_SESSION['user_phone'] ?? 'Not added'); ?></p>
+                            <p><i class="fa-solid fa-location-dot"></i> <?php echo e($_SESSION['user_location'] ?? 'Not added'); ?></p>
+                            <p><i class="fa-solid fa-house"></i> <?php echo e($_SESSION['user_address'] ?? 'Not added'); ?></p>
+                        </div>
+                        <div class="profile-livebar-actions">
+                            <a href="profile.php" class="outline-btn">Full Profile</a>
+                            <a href="login.php?logout=true" class="primary-btn">Logout</a>
+                        </div>
+                    </div>
+                </li>
+            <?php endif; ?>
+
             <a href="#" id="close"><i class="fa fa-times"></i></a>
         </ul>
     </div>
@@ -49,9 +73,35 @@ function renderHeader($current = '') {
             <i class="fa-solid fa-bag-shopping"></i>
             <span class="cart-count">0</span>
         </a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <button type="button" class="profile-icon profile-toggle mobile-profile" aria-label="Open profile" aria-expanded="false">
+                <i class="fa-solid fa-user"></i>
+            </button>
+        <?php endif; ?>
         <i id="bar" class="fas fa-outdent"></i>
     </div>
 </section>
+
+<?php if (isset($_SESSION['user_id'])): ?>
+<div class="profile-livebar mobile-profile-panel">
+    <div class="profile-livebar-head">
+        <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+        <div>
+            <h4><?php echo e($_SESSION['user_name'] ?? 'Customer'); ?></h4>
+            <p><?php echo e($_SESSION['user_email'] ?? ''); ?></p>
+        </div>
+    </div>
+    <div class="profile-livebar-info">
+        <p><i class="fa-solid fa-phone"></i> <?php echo e($_SESSION['user_phone'] ?? 'Not added'); ?></p>
+        <p><i class="fa-solid fa-location-dot"></i> <?php echo e($_SESSION['user_location'] ?? 'Not added'); ?></p>
+        <p><i class="fa-solid fa-house"></i> <?php echo e($_SESSION['user_address'] ?? 'Not added'); ?></p>
+    </div>
+    <div class="profile-livebar-actions">
+        <a href="profile.php" class="outline-btn">Full Profile</a>
+        <a href="login.php?logout=true" class="primary-btn">Logout</a>
+    </div>
+</div>
+<?php endif; ?>
 <?php
 }
 
@@ -72,9 +122,9 @@ function renderFooter() {
         <div class="follow">
             <h4>Follow Us</h4>
             <div class="icon">
-                <i class="fab fa-facebook-f"></i>
-                <i class="fab fa-instagram"></i>
-                <i class="fab fa-linkedin"></i>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
             </div>
         </div>
     </div>
@@ -89,17 +139,15 @@ function renderFooter() {
 
     <div class="col">
         <h4>My Account</h4>
-
-        <?php if (isset($_SESSION['user_id'])) { ?>
+        <?php if (isset($_SESSION['user_id'])): ?>
             <a href="profile.php">My Profile</a>
             <a href="cart.php">View Cart</a>
             <a href="login.php?logout=true">Logout</a>
-        <?php } else { ?>
+        <?php else: ?>
             <a href="login.php">Sign In</a>
             <a href="cart.php">View Cart</a>
-        <?php } ?>
-
-        <a href="shop.php">Wishlist</a>
+        <?php endif; ?>
+        <a href="shop.php">Shop</a>
         <a href="contact.php">Help</a>
     </div>
 
