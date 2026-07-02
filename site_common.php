@@ -75,7 +75,7 @@ function renderFooter() {
         <a href="shop.php">Shop</a>
         <a href="blog.php">Blog</a>
         <a href="about.php">About Us</a>
-        <a href="contact.php">Contact / Help</a>
+        <a href="contact.php">Contact</a>
     </div>
 
     <div class="col">
@@ -91,7 +91,7 @@ function renderFooter() {
     </div>
 
     <div class="copyright">
-        <p>© 2026 SolarMart. PHP/MySQL ecommerce website.</p>
+        <p>© 2026 SolarMart. All rights reserved.</p>
     </div>
 </footer>
 <?php

@@ -1,7 +1,7 @@
 <?php include "admin_common.php"; ?>
 <?php adminPageStart('products', 'Products'); ?>
 <h1>Products</h1>
-<p>Add, edit, and delete shop products from this page.</p>
+
 <?php adminAlerts($message, $error); ?>
 
 <div class="card">
@@ -40,13 +40,14 @@
     <h3>Manage Products</h3>
     <div class="table-wrap">
         <table class="cart-table">
-            <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>SKU</th><th>Action</th></tr></thead>
+            <thead><tr><th>Image</th><th>Name</th><th>Description</th><th>Category</th><th>Price</th><th>Stock</th><th>SKU</th><th>Action</th></tr></thead>
             <tbody>
             <?php if (mysqli_num_rows($products) > 0): ?>
                 <?php while ($product = mysqli_fetch_assoc($products)): ?>
                     <tr>
                         <td><img src="<?php echo htmlspecialchars($product['image']); ?>" alt="" style="width:55px;height:45px;object-fit:contain"></td>
                         <td><?php echo htmlspecialchars($product['name']); ?></td>
+                        <td><?php echo htmlspecialchars($product['description']); ?></td>
                         <td><?php echo htmlspecialchars($product['category']); ?></td>
                         <td>Rs <?php echo number_format($product['price']); ?></td>
                         <td><?php echo (int)$product['stock']; ?></td>

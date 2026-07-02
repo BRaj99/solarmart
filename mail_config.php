@@ -15,4 +15,7 @@ define('SMTP_SECURE', 'tls');
 
 define('MAIL_FROM_EMAIL', 'birajbasaula1@gmail.com');
 define('MAIL_FROM_NAME', 'SolarMart');
+
+// Customer contact form messages will be delivered to this email.
+define('CONTACT_RECEIVER_EMAIL', MAIL_FROM_EMAIL);
 ?>

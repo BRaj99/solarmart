@@ -86,16 +86,88 @@ function sendInvoicePdfEmail($toEmail, $toName, $orderNumber, $invoiceHtml) {
     $mail->Body = "
         <div style='font-family:Arial,sans-serif;color:#18221D;'>
             <p>Dear {$safeName},</p>
-            <p>Your SolarMart order has been placed successfully.</p>
+            <p>Your SolarMart order has been delivered successfully.</p>
             <p><strong>Order Number:</strong> {$safeOrder}</p>
             <p>Your invoice PDF is attached with this email.</p>
             <p>Thank you for shopping with SolarMart.</p>
         </div>";
-    $mail->AltBody = "Dear {$toName}, your SolarMart order {$orderNumber} has been placed successfully. Your invoice PDF is attached.";
+    $mail->AltBody = "Dear {$toName}, your SolarMart order {$orderNumber} has been delivered successfully. Your invoice PDF is attached.";
 
     $pdfString = createInvoicePdfString($invoiceHtml);
     $mail->addStringAttachment($pdfString, 'SolarMart-Invoice-' . $orderNumber . '.pdf', 'base64', 'application/pdf');
 
     return $mail->send();
 }
+
+function sendCustomerQueryEmail($customerName, $customerEmail, $subject, $messageText) {
+    $mail = solarMartMailer();
+    $mail->addAddress(CONTACT_RECEIVER_EMAIL, MAIL_FROM_NAME);
+    $mail->addReplyTo($customerEmail, $customerName ?: $customerEmail);
+    $mail->isHTML(true);
+
+    $safeName = htmlspecialchars($customerName ?: 'Customer');
+    $safeEmail = htmlspecialchars($customerEmail);
+    $safeSubject = htmlspecialchars($subject ?: 'Customer Query');
+    $safeMessage = nl2br(htmlspecialchars($messageText));
+
+    $mail->Subject = 'SolarMart Customer Query - ' . ($subject ?: 'Contact Form');
+    $mail->Body = "
+        <div style='font-family:Arial,sans-serif;color:#18221D;max-width:650px;'>
+            <h2>New Customer Query</h2>
+            <p><strong>Name:</strong> {$safeName}</p>
+            <p><strong>Email:</strong> {$safeEmail}</p>
+            <p><strong>Subject:</strong> {$safeSubject}</p>
+            <div style='margin-top:16px;padding:14px;border:1px solid #DCEBDD;border-radius:10px;background:#F8FCF9;'>{$safeMessage}</div>
+        </div>";
+    $mail->AltBody = "New SolarMart customer query\nName: {$customerName}\nEmail: {$customerEmail}\nSubject: {$subject}\n\n{$messageText}";
+
+    return $mail->send();
+}
+
+function buildDeliveredInvoiceHtml($order, $items) {
+    $rows = '';
+    foreach ($items as $item) {
+        $rows .= "<tr>
+            <td style='padding:10px;border-bottom:1px solid #ddd;'>" . htmlspecialchars($item['product_name']) . "</td>
+            <td style='padding:10px;border-bottom:1px solid #ddd;text-align:center;'>" . (int)$item['quantity'] . "</td>
+            <td style='padding:10px;border-bottom:1px solid #ddd;text-align:right;'>Rs " . number_format((float)$item['price'], 2) . "</td>
+            <td style='padding:10px;border-bottom:1px solid #ddd;text-align:right;'>Rs " . number_format((float)$item['line_total'], 2) . "</td>
+        </tr>";
+    }
+
+    return "
+    <div style='font-family:Arial,sans-serif;max-width:760px;margin:auto;color:#18221D;'>
+        <div style='background:#0F3324;color:white;padding:22px;border-radius:16px 16px 0 0;'>
+            <h2 style='margin:0;color:white;'>SolarMart Invoice</h2>
+            <p style='margin:8px 0 0;color:#d7f2e3;'>Invoice No: <strong>" . htmlspecialchars($order['order_number']) . "</strong></p>
+        </div>
+        <div style='border:1px solid #DCEBDD;border-top:0;padding:22px;border-radius:0 0 16px 16px;'>
+            <h3>Customer Details</h3>
+            <p><strong>Name:</strong> " . htmlspecialchars($order['customer_name']) . "<br>
+            <strong>Email:</strong> " . htmlspecialchars($order['customer_email']) . "<br>
+            <strong>Phone:</strong> " . htmlspecialchars($order['customer_phone']) . "<br>
+            <strong>Address:</strong> " . htmlspecialchars($order['delivery_address']) . "<br>
+            <strong>Payment:</strong> " . htmlspecialchars($order['payment_method']) . "</p>
+            <table style='width:100%;border-collapse:collapse;margin-top:16px;'>
+                <thead>
+                    <tr style='background:#E8F8EF;'>
+                        <th style='padding:10px;text-align:left;'>Product</th>
+                        <th style='padding:10px;text-align:center;'>Qty</th>
+                        <th style='padding:10px;text-align:right;'>Price</th>
+                        <th style='padding:10px;text-align:right;'>Total</th>
+                    </tr>
+                </thead>
+                <tbody>{$rows}</tbody>
+            </table>
+            <div style='margin-top:18px;text-align:right;'>
+                <p>Subtotal: <strong>Rs " . number_format((float)$order['subtotal'], 2) . "</strong></p>
+                <p>Shipping: <strong>" . ((float)$order['shipping'] > 0 ? 'Rs ' . number_format((float)$order['shipping'], 2) : 'Free') . "</strong></p>
+                <p>VAT: <strong>Rs " . number_format((float)$order['tax'], 2) . "</strong></p>
+                <h2 style='color:#1B8A5A;'>Grand Total: Rs " . number_format((float)$order['grand_total'], 2) . "</h2>
+            </div>
+            <p style='margin-top:20px;color:#66756D;'>Thank you for shopping with SolarMart.</p>
+        </div>
+    </div>";
+}
+
 ?>

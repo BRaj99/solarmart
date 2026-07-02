@@ -1,4 +1,4 @@
-const demoProducts = [
+const fallbackProducts = [
   { id: 1, name: 'Mono Solar Panel 550W', brand: 'SunPeak', category: 'Panels', price: 28500, stock: 18, image: 'images/mono-solar-panel.svg', desc: 'High efficiency mono panel for home and commercial rooftop systems.' },
   { id: 2, name: 'Hybrid Solar Inverter 5kW', brand: 'VoltEdge', category: 'Inverters', price: 125000, stock: 7, image: 'images/hybrid-solar-inverter.svg', desc: 'Smart hybrid inverter with battery support and LCD monitoring.' },
   { id: 3, name: 'Lithium Battery 48V 100Ah', brand: 'PowerCell', category: 'Batteries', price: 185000, stock: 5, image: 'images/lithium-battery.svg', desc: 'Long-life lithium storage for backup and off-grid power.' },
@@ -9,7 +9,7 @@ const demoProducts = [
   { id: 8, name: 'Solar Cable 6mm Bundle', brand: 'SafeWire', category: 'Accessories', price: 8500, stock: 40, image: 'images/solar-cable-bundle.svg', desc: 'UV-resistant solar cable bundle for safer installation.' }
 ];
 
-const products = Array.isArray(window.SOLAR_PRODUCTS) && window.SOLAR_PRODUCTS.length ? window.SOLAR_PRODUCTS : demoProducts;
+const products = Array.isArray(window.SOLAR_PRODUCTS) && window.SOLAR_PRODUCTS.length ? window.SOLAR_PRODUCTS : fallbackProducts;
 const orders = [
   { id: 'ORD-1001', customer: 'Aarav Shrestha', total: 153500, status: 'Processing' },
   { id: 'ORD-1002', customer: 'Nisha Gurung', total: 28500, status: 'Delivered' },
@@ -17,6 +17,17 @@ const orders = [
 ];
 
 const formatRs = value => `Rs ${Number(value || 0).toLocaleString('en-IN')}`;
+
+function escapeHtml(value) {
+  return String(value || '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }[char]));
+}
+
 
 function getCart() {
   try {
@@ -74,16 +85,20 @@ function addToCart(id, qty = 1) {
 }
 
 function productCard(product) {
-  return `<div class="pro" data-category="${product.category || ''}">
-    <div class="product-img"><img src="${product.image || ''}" alt="${product.name || 'Product'}" loading="lazy"></div>
-    <div class="des">
-      <span>${product.brand || ''} • ${product.category || ''}</span>
-      <h5>${product.name || ''}</h5>
-      <div class="star"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-stroke"></i></div>
-      <p>${product.desc || ''}</p>
-      <h4>${formatRs(product.price)}</h4>
-    </div>
-    <button class="cart add-cart" data-id="${product.id}" aria-label="Add to cart"><i class="fa-solid fa-cart-shopping"></i></button>
+  const description = escapeHtml(product.desc || 'Product description will be updated soon.');
+  const shortDescription = description.length > 120 ? description.slice(0, 120) + '...' : description;
+
+  return `<div class="pro" data-category="${escapeHtml(product.category)}">
+    <a class="product-card-link" href="product.php?id=${Number(product.id)}">
+      <div class="product-img"><img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy"></div>
+      <div class="des">
+        <span>${escapeHtml(product.brand)} • ${escapeHtml(product.category)}</span>
+        <h5>${escapeHtml(product.name)}</h5>
+        <p class="product-card-description">${shortDescription}</p>
+        <h4>${formatRs(product.price)}</h4>
+      </div>
+    </a>
+    <button class="cart add-cart" data-id="${Number(product.id)}" aria-label="Add to cart"><i class="fa-solid fa-cart-shopping"></i></button>
   </div>`;
 }
 
@@ -102,7 +117,7 @@ function initShop() {
     let list = [...products];
     const term = (search?.value || '').toLowerCase();
     const cat = category?.value || 'All';
-    if (term) list = list.filter(p => `${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(term));
+    if (term) list = list.filter(p => `${p.name} ${p.brand} ${p.category} ${p.desc || ''}`.toLowerCase().includes(term));
     if (cat !== 'All') list = list.filter(p => p.category === cat);
     if (sort?.value === 'low') list.sort((a, b) => Number(a.price) - Number(b.price));
     if (sort?.value === 'high') list.sort((a, b) => Number(b.price) - Number(a.price));

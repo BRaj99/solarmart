@@ -125,11 +125,11 @@ function e($value) {
             <i class="fa-solid fa-sun"></i> Clean power for every home
         </span>
 
-        <h4>Solar products, kits and installation essentials</h4>
+        <h4>Solar products and installation essentials</h4>
         <h1>Power your future with <span>sunshine</span></h1>
 
         <p>
-            Explore panels, inverters, batteries, lights and complete solar kits with a smooth demo shopping experience.
+            Explore panels, inverters, batteries, lights and complete solar kits.
         </p>
 
         <div class="hero-actions">
@@ -155,12 +155,12 @@ function e($value) {
 
     <div class="stat-card">
         <strong>13%</strong>
-        <p>VAT estimate shown in cart</p>
+        <p>VAT calculated at checkout</p>
     </div>
 
     <div class="stat-card">
         <strong>24/7</strong>
-        <p>Demo support experience</p>
+        <p>Customer support</p>
     </div>
 </section>
 
@@ -204,8 +204,8 @@ function e($value) {
 
 <section id="banner" class="section-m1">
     <h4>Solar Services</h4>
-    <h2>Get clean energy with <span>smart products</span> and simple ordering</h2>
-    <a class="normal" href="shop.php">Explore More</a>
+    <h2>Get clean energy with <span>smart products</span></h2>
+    <a class="normal" href="shop.php">Shop Now</a>
 </section>
 
 <section id="newsletter" class="section-p1 section-m1">
@@ -267,7 +267,7 @@ function e($value) {
     </div>
 
     <div class="copyright">
-        <p>© 2026 SolarMart. Static demo ecommerce website.</p>
+        <p>© 2026 SolarMart. All rights reserved.</p>
     </div>
 </footer>
 

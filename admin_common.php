@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "db.php";
+require_once "mail_helper.php";
 
 $message = clean($_GET["msg"] ?? "");
 $error = clean($_GET["err"] ?? "");
@@ -11,6 +12,12 @@ function clean($value) {
 
 
 // Creates the stock log table automatically if it is missing.
+
+$columnCheck = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'invoice_sent_at'");
+if ($columnCheck && mysqli_num_rows($columnCheck) === 0) {
+    mysqli_query($conn, "ALTER TABLE orders ADD COLUMN invoice_sent_at TIMESTAMP NULL DEFAULT NULL");
+}
+
 mysqli_query($conn, "CREATE TABLE IF NOT EXISTS stock_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
@@ -203,6 +210,38 @@ function nepaliDateDropdowns($prefix, $selectedAdDate = "") {
     echo '</div>';
 }
 
+
+function sendDeliveredInvoiceForOrder($conn, $orderId) {
+    $stmt = mysqli_prepare($conn, "SELECT * FROM orders WHERE id=? LIMIT 1");
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    mysqli_stmt_execute($stmt);
+    $order = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+    if (!$order) {
+        throw new Exception("Order not found.");
+    }
+
+    $stmt = mysqli_prepare($conn, "SELECT product_name, price, quantity, line_total FROM order_items WHERE order_id=? ORDER BY id ASC");
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    mysqli_stmt_execute($stmt);
+    $itemsResult = mysqli_stmt_get_result($stmt);
+    $items = [];
+    while ($item = mysqli_fetch_assoc($itemsResult)) {
+        $items[] = $item;
+    }
+
+    if (count($items) === 0) {
+        throw new Exception("No order items found for invoice.");
+    }
+
+    $invoiceHtml = buildDeliveredInvoiceHtml($order, $items);
+    sendInvoicePdfEmail($order['customer_email'], $order['customer_name'], $order['order_number'], $invoiceHtml);
+
+    $stmt = mysqli_prepare($conn, "UPDATE orders SET invoice_sent_at = NOW() WHERE id=?");
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    mysqli_stmt_execute($stmt);
+}
+
 function uploadProductImage($fileInputName, $oldImage = "") {
     if (!isset($_FILES[$fileInputName]) || $_FILES[$fileInputName]['error'] !== UPLOAD_ERR_OK) {
         return $oldImage ?: "images/solar-placeholder.svg";
@@ -379,9 +418,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $allowedStatuses = ["Pending", "Processing", "Delivered", "Cancelled"];
 
         if ($orderId > 0 && in_array($status, $allowedStatuses)) {
-            $stmt = mysqli_prepare($conn, "UPDATE orders SET status=? WHERE id=?");
-            mysqli_stmt_bind_param($stmt, "si", $status, $orderId);
-            $message = mysqli_stmt_execute($stmt) ? "Order status updated." : "Could not update order status.";
+            $stmt = mysqli_prepare($conn, "SELECT status, invoice_sent_at FROM orders WHERE id=? LIMIT 1");
+            mysqli_stmt_bind_param($stmt, "i", $orderId);
+            mysqli_stmt_execute($stmt);
+            $currentOrder = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+            if (!$currentOrder) {
+                $error = "Order not found.";
+            } elseif ($currentOrder["status"] === "Delivered") {
+                $error = "Delivered orders cannot be changed.";
+            } else {
+                $stmt = mysqli_prepare($conn, "UPDATE orders SET status=? WHERE id=?");
+                mysqli_stmt_bind_param($stmt, "si", $status, $orderId);
+
+                if (mysqli_stmt_execute($stmt)) {
+                    $message = "Order status updated.";
+
+                    if ($status === "Delivered" && empty($currentOrder["invoice_sent_at"])) {
+                        try {
+                            sendDeliveredInvoiceForOrder($conn, $orderId);
+                            $message = "Order marked as Delivered and invoice sent to customer.";
+                        } catch (Exception $mailError) {
+                            $message = "Order marked as Delivered, but invoice email was not sent. Check mail_config.php. " . $mailError->getMessage();
+                        }
+                    }
+                } else {
+                    $error = "Could not update order status.";
+                }
+            }
         }
     }
 }

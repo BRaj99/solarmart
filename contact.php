@@ -1,6 +1,7 @@
 <?php
 require_once 'site_common.php';
 require_once 'db.php';
+require_once 'mail_helper.php';
 
 mysqli_query($conn, "CREATE TABLE IF NOT EXISTS contact_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -27,7 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = mysqli_prepare($conn, "INSERT INTO contact_messages (name, email, subject, message) VALUES (?, ?, ?, ?)");
         mysqli_stmt_bind_param($stmt, 'ssss', $name, $email, $subject, $message);
         if (mysqli_stmt_execute($stmt)) {
-            $success = 'Message sent successfully. We will contact you soon.';
+            try {
+                sendCustomerQueryEmail($name, $email, $subject, $message);
+                $success = 'Message sent successfully. We will contact you soon.';
+            } catch (Exception $mailError) {
+                $success = 'Message saved successfully, but email could not be sent. Please check mail_config.php.';
+            }
         } else {
             $error = 'Could not save your message. Please try again.';
         }
@@ -53,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="card">
         <h3>Store Details</h3>
         <p><strong>Address:</strong> Kathmandu, Nepal</p>
-        <p><strong>Email:</strong> support@solarmart.demo</p>
+        <p><strong>Email:</strong> <?php echo e(CONTACT_RECEIVER_EMAIL); ?></p>
         <p><strong>Phone:</strong> +977-9800000000</p>
         <p><strong>Hours:</strong> 9:00 - 18:00, Sun-Fri</p>
         <a class="outline-btn" href="shop.php">Go to Shop</a>

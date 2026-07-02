@@ -168,16 +168,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 mysqli_stmt_execute($stmt);
             }
 
-            $invoiceHtml = buildInvoiceHtml($orderNumber, $customerName, $customerEmail, $customerPhone, $deliveryAddress, $paymentMethod, $validItems, $subtotal, $shipping, $tax, $grandTotal);
             mysqli_commit($conn);
 
             $message = "Order placed successfully. Your order number is " . $orderNumber . ".";
-            try {
-                sendInvoiceEmail($customerEmail, $customerName, $orderNumber, $invoiceHtml);
-                $emailStatus = "Invoice PDF sent to your registered email: " . $customerEmail;
-            } catch (Exception $mailError) {
-                $emailStatus = "Order saved, but invoice email was not sent. " . $mailError->getMessage();
-            }
+            $emailStatus = "Invoice will be sent to your email after the order status is marked as Delivered.";
         } catch (Exception $e) {
             mysqli_rollback($conn);
             $error = $e->getMessage();
@@ -204,7 +198,7 @@ $productRows = getProductsForJs($conn);
         <div id="mobile"><a href="cart.php"><i class="fa-solid fa-bag-shopping"></i><span class="cart-count">0</span></a><i id="bar" class="fas fa-outdent"></i></div>
     </section>
 
-    <section class="page-header"><h1>Checkout</h1><p>Only logged-in customers can place orders. Invoice is generated after purchase.</p></section>
+    <section class="page-header"><h1>Checkout</h1><p>Only logged-in customers can place orders. Invoice will be emailed after your order is delivered.</p></section>
 
     <section class="section-p1 checkout-layout">
         <form id="checkoutForm" class="card form-stack checkout-card" method="POST">
@@ -227,18 +221,13 @@ $productRows = getProductsForJs($conn);
                 <option>Digital Wallet</option>
             </select>
             <input type="hidden" name="cart_data" id="cartDataInput">
-            <button class="primary-btn" type="submit">Place Order & Send Invoice</button>
+            <button class="primary-btn" type="submit">Place Order</button>
         </form>
 
         <div class="card checkout-card">
             <h3>Order Summary</h3>
             <div id="checkoutSummary"><p>Your checkout summary will appear here.</p></div>
-            <?php if ($invoiceHtml): ?>
-                <div class="invoice-preview">
-                    <h3>Invoice Preview</h3>
-                    <?php echo $invoiceHtml; ?>
-                </div>
-            <?php endif; ?>
+
         </div>
     </section>
 

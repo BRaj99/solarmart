@@ -2,7 +2,7 @@
 <?php adminPageStart('dashboard', 'Admin Dashboard'); ?>
 
 <h1>Dashboard</h1>
-<p>Products, customers, orders, stock alerts, and sales graphs are loaded from your MySQL database.</p>
+<p>Manage products, customers, orders, stock and sales.</p>
 <?php adminAlerts($message, $error); ?>
 
 <div class="admin-cards">
@@ -27,30 +27,30 @@
 <div class="grid-2 admin-chart-grid">
     <div class="card">
         <h3>Monthly Sales</h3>
-        <p>Sales amount from recent orders.</p>
+        <p>Recent order sales.</p>
         <canvas id="salesChart" height="130"></canvas>
     </div>
     <div class="card">
         <h3>Order Status</h3>
-        <p>Current order status summary.</p>
+        <p>Order status summary.</p>
         <canvas id="orderStatusChart" height="130"></canvas>
     </div>
 </div>
 
 <div class="card" style="margin-top:22px;">
     <h3>Lowest Stock Products</h3>
-    <p>Products with the lowest stock are shown first.</p>
+    <p>Lowest stock products are shown first.</p>
     <canvas id="stockChart" height="90"></canvas>
 </div>
 
 <div class="card" style="margin-top:22px;">
     <h3>Admin Sections</h3>
-    <p>Use these quick links to manage each function on its own page.</p>
+    <p>Quick links for store management.</p>
     <div class="admin-cards">
-        <a class="card metric-card" href="admin_orders.php"><p>Open</p><h2>Orders</h2></a>
-        <a class="card metric-card" href="admin_stock.php"><p>Open</p><h2>Stock</h2></a>
-        <a class="card metric-card" href="admin_products.php"><p>Open</p><h2>Products</h2></a>
-        <a class="card metric-card" href="admin_customers.php"><p>Open</p><h2>Customers</h2></a>
+        <a class="card metric-card" href="admin_orders.php"><p>Manage</p><h2>Orders</h2></a>
+        <a class="card metric-card" href="admin_stock.php"><p>Manage</p><h2>Stock</h2></a>
+        <a class="card metric-card" href="admin_products.php"><p>Manage</p><h2>Products</h2></a>
+        <a class="card metric-card" href="admin_customers.php"><p>Manage</p><h2>Customers</h2></a>
     </div>
 </div>
 

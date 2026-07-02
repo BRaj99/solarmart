@@ -10,7 +10,7 @@
             <thead>
                 <tr>
                     <th>Order No.</th><th>Customer</th><th>Contact</th><th>Products Bought</th>
-                    <th>Total</th><th>Payment</th><th>Status</th><th>Date</th>
+                    <th>Total</th><th>Payment</th><th>Status</th><th>Invoice</th><th>Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,21 +28,35 @@
                         <td>Rs <?php echo number_format($order["grand_total"]); ?></td>
                         <td><?php echo htmlspecialchars($order["payment_method"]); ?></td>
                         <td>
-                            <form method="POST" class="inline-status-form">
-                                <input type="hidden" name="action" value="update_order_status">
-                                <input type="hidden" name="order_id" value="<?php echo (int)$order["id"]; ?>">
-                                <select name="status" onchange="this.form.submit()">
-                                    <?php foreach (["Pending", "Processing", "Delivered", "Cancelled"] as $status): ?>
-                                        <option value="<?php echo $status; ?>" <?php echo $order["status"] === $status ? "selected" : ""; ?>><?php echo $status; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </form>
+                            <?php if ($order["status"] === "Delivered"): ?>
+                                <strong>Delivered</strong><br>
+                                <small>Status locked</small>
+                            <?php else: ?>
+                                <form method="POST" class="inline-status-form">
+                                    <input type="hidden" name="action" value="update_order_status">
+                                    <input type="hidden" name="order_id" value="<?php echo (int)$order["id"]; ?>">
+                                    <select name="status" onchange="this.form.submit()">
+                                        <?php foreach (["Pending", "Processing", "Delivered", "Cancelled"] as $status): ?>
+                                            <option value="<?php echo $status; ?>" <?php echo $order["status"] === $status ? "selected" : ""; ?>><?php echo $status; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </form>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($order["status"] === "Delivered" && !empty($order["invoice_sent_at"])): ?>
+                                Sent<br><small><?php echo date("M d, Y h:i A", strtotime($order["invoice_sent_at"])); ?></small>
+                            <?php elseif ($order["status"] === "Delivered"): ?>
+                                Delivery confirmed
+                            <?php else: ?>
+                                After delivery
+                            <?php endif; ?>
                         </td>
                         <td><?php echo date("M d, Y h:i A", strtotime($order["created_at"])); ?></td>
                     </tr>
                 <?php endwhile; ?>
             <?php else: ?>
-                <tr><td colspan="8">No customer orders yet.</td></tr>
+                <tr><td colspan="9">No customer orders yet.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

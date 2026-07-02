@@ -39,7 +39,7 @@ if ($productResult) {
             <i class="fa fa-solar-panel"></i> Solar Store
         </span>
         <h1>Shop Products</h1>
-        <p>Products are loaded from MySQL. Customers can add products to cart and buy them at checkout.</p>
+        <p>Browse solar panels, batteries, inverters, lights, kits and accessories.</p>
     </section>
 
     <section id="product1" class="section-p1">
@@ -69,7 +69,7 @@ if ($productResult) {
     <section id="newsletter" class="section-p1 section-m1">
         <div>
             <h4>Need help choosing?</h4>
-            <p>Send us your load details and roof size for a demo recommendation.</p>
+            <p>Send us your load details and roof size for a product recommendation.</p>
         </div>
         <a class="normal" href="contact.php">Contact Us</a>
     </section>
