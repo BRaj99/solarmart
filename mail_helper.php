@@ -30,6 +30,35 @@ function solarMartMailer() {
     return $mail;
 }
 
+
+function sendOtpEmail($toEmail, $toName, $otp, $purpose = 'verification') {
+    $mail = solarMartMailer();
+    $mail->addAddress($toEmail, $toName ?: $toEmail);
+    $mail->isHTML(true);
+
+    $safeName = htmlspecialchars($toName ?: 'Customer');
+    $safeOtp = htmlspecialchars($otp);
+    $title = ($purpose === 'password_reset') ? 'Password Reset OTP' : 'Registration OTP';
+
+    $mail->Subject = 'SolarMart ' . $title;
+    $mail->Body = "
+        <div style='font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#18221D;'>
+            <div style='background:#0F3324;color:white;padding:22px;border-radius:14px 14px 0 0;'>
+                <h2 style='margin:0;color:white;'>SolarMart {$title}</h2>
+            </div>
+            <div style='border:1px solid #DCEBDD;border-top:0;padding:22px;border-radius:0 0 14px 14px;'>
+                <p>Dear {$safeName},</p>
+                <p>Your verification code is:</p>
+                <div style='font-size:30px;font-weight:bold;letter-spacing:8px;background:#F1F8F4;color:#0F3324;padding:16px;text-align:center;border-radius:12px;margin:18px 0;'>{$safeOtp}</div>
+                <p>This OTP is valid for only <strong>1 minute</strong>.</p>
+                <p>If you did not request this OTP, please ignore this email.</p>
+            </div>
+        </div>";
+    $mail->AltBody = "Your SolarMart OTP is: {$otp}\nThis OTP is valid for only 1 minute.";
+
+    return $mail->send();
+}
+
 function sendResetPasswordEmail($toEmail, $toName, $resetLink) {
     $mail = solarMartMailer();
     $mail->addAddress($toEmail, $toName ?: $toEmail);
