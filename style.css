@@ -2717,3 +2717,25 @@ button:disabled {
         flex-direction: column;
     }
 }
+
+.view-details-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(34, 139, 80, .12);
+    color: var(--solar-green);
+    font-weight: 800;
+}
+
+.view-details-btn:hover {
+    background: var(--solar-green);
+    color: #fff;
+}
+
+.product-detail-info .product-description-box p {
+    font-size: 17px;
+    line-height: 1.9;
+}

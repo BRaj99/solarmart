@@ -6,7 +6,7 @@ $id = (int)($_GET["id"] ?? 0);
 $product = null;
 
 if ($id > 0) {
-    $stmt = mysqli_prepare($conn, "SELECT id, name, brand, category, price, stock, sku, image, description FROM products WHERE id = ? LIMIT 1");
+    $stmt = mysqli_prepare($conn, "SELECT * FROM products WHERE id = ? LIMIT 1");
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -52,7 +52,7 @@ if ($description === "" && $product) {
         </div>
 
         <div class="product-meta">
-            <p><strong>SKU:</strong> <?php echo e($product["sku"]); ?></p>
+            <?php if (!empty($product["sku"])): ?><p><strong>SKU:</strong> <?php echo e($product["sku"]); ?></p><?php endif; ?>
             <p><strong>Stock:</strong> <?php echo (int)$product["stock"]; ?> available</p>
         </div>
 

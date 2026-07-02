@@ -3,6 +3,24 @@ session_start();
 function e($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
+
+include "db.php";
+$productRows = [];
+$productResult = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products WHERE stock > 0 ORDER BY id DESC LIMIT 8");
+if ($productResult) {
+    while ($row = mysqli_fetch_assoc($productResult)) {
+        $productRows[] = [
+            "id" => (int)$row["id"],
+            "name" => $row["name"],
+            "brand" => $row["brand"],
+            "category" => $row["category"],
+            "price" => (float)$row["price"],
+            "stock" => (int)$row["stock"],
+            "image" => $row["image"],
+            "desc" => $row["description"]
+        ];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -271,6 +289,9 @@ function e($value) {
     </div>
 </footer>
 
+<script>
+window.SOLAR_PRODUCTS = <?php echo json_encode($productRows, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+</script>
 <script src="script.js"></script>
 </body>
 </html>

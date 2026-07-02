@@ -90,16 +90,14 @@ function productCard(product) {
   const productUrl = `product.php?id=${Number(product.id)}`;
 
   return `<div class="pro product-clickable" data-category="${escapeHtml(product.category)}" data-url="${productUrl}" role="link" tabindex="0">
-    <a class="product-card-link" href="${productUrl}" aria-label="View ${escapeHtml(product.name || 'product')} details">
-      <div class="product-img"><img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy"></div>
-      <div class="des">
-        <span>${escapeHtml(product.brand)} • ${escapeHtml(product.category)}</span>
-        <h5>${escapeHtml(product.name)}</h5>
-        <p class="product-card-description">${shortDescription}</p>
-        <h4>${formatRs(product.price)}</h4>
-        <small class="view-details-text">Click to view full description</small>
-      </div>
-    </a>
+    <div class="product-img"><img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy"></div>
+    <div class="des">
+      <span>${escapeHtml(product.brand)} • ${escapeHtml(product.category)}</span>
+      <h5>${escapeHtml(product.name)}</h5>
+      <p class="product-card-description">${shortDescription}</p>
+      <h4>${formatRs(product.price)}</h4>
+      <a class="view-details-btn" href="${productUrl}">View Full Description</a>
+    </div>
     <button class="cart add-cart" data-id="${Number(product.id)}" aria-label="Add to cart"><i class="fa-solid fa-cart-shopping"></i></button>
   </div>`;
 }
@@ -255,7 +253,7 @@ document.addEventListener('click', e => {
   }
 
   const productCard = e.target.closest('.product-clickable');
-  if (productCard && productCard.dataset.url && !e.target.closest('a')) {
+  if (productCard && productCard.dataset.url && !e.target.closest('a') && !e.target.closest('button')) {
     window.location.href = productCard.dataset.url;
   }
 });
