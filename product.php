@@ -16,6 +16,11 @@ if ($id > 0) {
 if (!$product) {
     http_response_code(404);
 }
+
+$description = trim($product["description"] ?? "");
+if ($description === "" && $product) {
+    $description = "This solar product is selected for reliable daily performance, energy saving, and long-term use. Contact SolarMart for installation support, warranty information, and product recommendations.";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,19 +46,22 @@ if (!$product) {
         <h1><?php echo e($product["name"]); ?></h1>
         <h2>Rs <?php echo number_format((float)$product["price"]); ?></h2>
 
-        <p class="product-description">
-            <?php echo nl2br(e($product["description"] ?: "Product description will be updated soon.")); ?>
-        </p>
+        <div class="product-description-box">
+            <h3>Product Description</h3>
+            <p><?php echo nl2br(e($description)); ?></p>
+        </div>
 
         <div class="product-meta">
             <p><strong>SKU:</strong> <?php echo e($product["sku"]); ?></p>
             <p><strong>Stock:</strong> <?php echo (int)$product["stock"]; ?> available</p>
         </div>
 
-        <button class="primary-btn add-cart detail-cart-btn" data-id="<?php echo (int)$product["id"]; ?>">
-            <i class="fa-solid fa-cart-shopping"></i> Add to Cart
-        </button>
-        <a class="outline-btn" href="shop.php">Back to Shop</a>
+        <div class="product-actions">
+            <button class="primary-btn add-cart detail-cart-btn" data-id="<?php echo (int)$product["id"]; ?>">
+                <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+            </button>
+            <a class="outline-btn" href="shop.php">Back to Shop</a>
+        </div>
     </div>
 </section>
 <?php else: ?>

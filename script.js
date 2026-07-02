@@ -87,15 +87,17 @@ function addToCart(id, qty = 1) {
 function productCard(product) {
   const description = escapeHtml(product.desc || 'Product description will be updated soon.');
   const shortDescription = description.length > 120 ? description.slice(0, 120) + '...' : description;
+  const productUrl = `product.php?id=${Number(product.id)}`;
 
-  return `<div class="pro" data-category="${escapeHtml(product.category)}">
-    <a class="product-card-link" href="product.php?id=${Number(product.id)}">
+  return `<div class="pro product-clickable" data-category="${escapeHtml(product.category)}" data-url="${productUrl}" role="link" tabindex="0">
+    <a class="product-card-link" href="${productUrl}" aria-label="View ${escapeHtml(product.name || 'product')} details">
       <div class="product-img"><img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy"></div>
       <div class="des">
         <span>${escapeHtml(product.brand)} • ${escapeHtml(product.category)}</span>
         <h5>${escapeHtml(product.name)}</h5>
         <p class="product-card-description">${shortDescription}</p>
         <h4>${formatRs(product.price)}</h4>
+        <small class="view-details-text">Click to view full description</small>
       </div>
     </a>
     <button class="cart add-cart" data-id="${Number(product.id)}" aria-label="Add to cart"><i class="fa-solid fa-cart-shopping"></i></button>
@@ -239,9 +241,31 @@ function initForms() {
 
 document.addEventListener('click', e => {
   const add = e.target.closest('.add-cart');
-  if (add) addToCart(add.dataset.id);
+  if (add) {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(add.dataset.id);
+    return;
+  }
+
   const qty = e.target.closest('.qty-btn');
-  if (qty) changeCart(qty.dataset.id, qty.dataset.action);
+  if (qty) {
+    changeCart(qty.dataset.id, qty.dataset.action);
+    return;
+  }
+
+  const productCard = e.target.closest('.product-clickable');
+  if (productCard && productCard.dataset.url && !e.target.closest('a')) {
+    window.location.href = productCard.dataset.url;
+  }
+});
+
+document.addEventListener('keydown', e => {
+  const productCard = e.target.closest('.product-clickable');
+  if (productCard && productCard.dataset.url && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    window.location.href = productCard.dataset.url;
+  }
 });
 
 document.addEventListener('submit', e => {

@@ -28,8 +28,8 @@
                         <td>Rs <?php echo number_format($order["grand_total"]); ?></td>
                         <td><?php echo htmlspecialchars($order["payment_method"]); ?></td>
                         <td>
-                            <?php if ($order["status"] === "Delivered"): ?>
-                                <strong>Delivered</strong><br>
+                            <?php if (in_array($order["status"], ["Delivered", "Cancelled"])): ?>
+                                <strong><?php echo htmlspecialchars($order["status"]); ?></strong><br>
                                 <small>Status locked</small>
                             <?php else: ?>
                                 <form method="POST" class="inline-status-form">

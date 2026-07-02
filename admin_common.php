@@ -425,8 +425,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if (!$currentOrder) {
                 $error = "Order not found.";
-            } elseif ($currentOrder["status"] === "Delivered") {
-                $error = "Delivered orders cannot be changed.";
+             } elseif (in_array($currentOrder["status"], ["Delivered", "Cancelled"])) {
+                $error = $currentOrder["status"] . " orders cannot be changed.";
             } else {
                 $stmt = mysqli_prepare($conn, "UPDATE orders SET status=? WHERE id=?");
                 mysqli_stmt_bind_param($stmt, "si", $status, $orderId);
