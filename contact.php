@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact | SolarMart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260704_reviews">
 </head>
 <body>
 <?php renderHeader('contact'); ?>
@@ -76,6 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 </section>
 <?php renderFooter(); ?>
-<script src="script.js"></script>
+<script src="script.js?v=20260704_reviews"></script>
 </body>
 </html>

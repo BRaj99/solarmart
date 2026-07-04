@@ -89,7 +89,6 @@ function productCard(product) {
         <h5>${escapeHtml(product.name)}</h5>
         <p class="product-card-description">${shortDescription}</p>
         <h4>${formatRs(product.price)}</h4>
-        <strong class="view-details-btn">View Full Description</strong>
       </div>
     </a>
     <button class="cart add-cart" data-id="${Number(product.id)}" aria-label="Add to cart"><i class="fa-solid fa-cart-shopping"></i></button>
@@ -103,11 +102,35 @@ function renderProducts(list = products, selector = '#product-list') {
 }
 
 function initShop() {
-  renderProducts(products, '#product-list');
   const search = document.querySelector('#searchProducts');
   const category = document.querySelector('#categoryFilter');
   const sort = document.querySelector('#sortProducts');
   const stock = document.querySelector('#stockFilter');
+  const pagination = document.querySelector('#productPagination');
+  const pageSize = 8;
+  let currentPage = 1;
+  let filteredProducts = [...products];
+
+  const renderPagedProducts = () => {
+    const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * pageSize;
+    renderProducts(filteredProducts.slice(start, start + pageSize), '#product-list');
+
+    if (!pagination) return;
+    if (filteredProducts.length <= pageSize) {
+      pagination.innerHTML = '';
+      return;
+    }
+
+    let buttons = `<button class="page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+      buttons += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+    }
+    buttons += `<button class="page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+    pagination.innerHTML = buttons;
+  };
+
   const apply = () => {
     let list = [...products];
     const term = (search?.value || '').toLowerCase().trim();
@@ -129,9 +152,21 @@ function initShop() {
     if (sort?.value === 'high') list.sort((a, b) => Number(b.price) - Number(a.price));
     if (sort?.value === 'name') list.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 
-    renderProducts(list, '#product-list');
+    filteredProducts = list;
+    currentPage = 1;
+    renderPagedProducts();
   };
+
+  pagination?.addEventListener('click', e => {
+    const btn = e.target.closest('.page-btn');
+    if (!btn || btn.disabled) return;
+    currentPage = Number(btn.dataset.page || 1);
+    renderPagedProducts();
+    document.querySelector('#product1')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
   [search, category, stock, sort].forEach(el => el && el.addEventListener('input', apply));
+  apply();
 }
 
 function renderCart() {

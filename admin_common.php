@@ -734,7 +734,7 @@ function adminPageStart($activePage, $pageTitle = "Admin Panel") { ?>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($pageTitle); ?> | SolarMart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260704_reviews">
 </head>
 <body class="admin-page">
 <section id="header">
@@ -788,7 +788,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 </script>
-<script src="script.js"></script>
+<script src="script.js?v=20260704_reviews"></script>
 </body>
 </html>
 <?php }

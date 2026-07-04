@@ -2737,3 +2737,137 @@ button:disabled {
     white-space: normal;
     line-height: 1.8;
 }
+
+/* Product pagination and customer reviews */
+.product-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+}
+
+.page-btn {
+    min-width: 42px;
+    height: 42px;
+    border: 1px solid #d7e6dc;
+    background: #fff;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #24543a;
+    transition: 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled),
+.page-btn.active {
+    background: #088178;
+    color: #fff;
+    border-color: #088178;
+}
+
+.page-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.product-rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 18px;
+    color: #465b52;
+}
+
+.stars {
+    color: #f5a623;
+    letter-spacing: 2px;
+    font-size: 15px;
+}
+
+.product-reviews-section {
+    padding-top: 0;
+}
+
+.reviews-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 420px) 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.review-form-card,
+.review-list-card {
+    background: #fff;
+    border: 1px solid #e3ece8;
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
+}
+
+.review-form-card h3,
+.review-list-card h3 {
+    margin-bottom: 16px;
+    color: #1f3d35;
+}
+
+.review-form label {
+    display: block;
+    margin: 14px 0 8px;
+    font-weight: 700;
+    color: #1f3d35;
+}
+
+.review-form select,
+.review-form textarea {
+    width: 100%;
+    border: 1px solid #dbe7e2;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font: inherit;
+    outline: none;
+    background: #f9fcfb;
+}
+
+.review-form textarea {
+    resize: vertical;
+}
+
+.review-form button {
+    margin-top: 16px;
+    border: 0;
+}
+
+.review-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #edf3f0;
+}
+
+.review-item:last-child {
+    border-bottom: 0;
+}
+
+.review-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.review-item p {
+    color: #465b52;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.review-item small {
+    color: #8b9b94;
+}
+
+@media (max-width: 768px) {
+    .reviews-layout {
+        grid-template-columns: 1fr;
+    }
+}

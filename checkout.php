@@ -187,7 +187,7 @@ $productRows = getProductsForJs($conn);
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | SolarMart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260704_reviews">
 </head>
 <body>
     <section id="header"><a href="index.php" class="logo-wrap"><div class="logo-mark"></div><span>SolarMart</span></a>

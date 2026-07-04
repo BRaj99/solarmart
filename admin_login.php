@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['admin_login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | SolarMart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260704_reviews">
     <style>
         body.admin-auth-body { min-height:100vh; background:linear-gradient(135deg,#0f172a,#14532d); display:flex; align-items:center; justify-content:center; padding:24px; }
         .admin-auth-card { width:100%; max-width:430px; background:#fff; border-radius:22px; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,.25); }

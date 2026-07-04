@@ -3,7 +3,16 @@ require_once "site_common.php";
 require_once "db.php";
 
 $productRows = [];
-$productResult = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products WHERE stock > 0 ORDER BY id DESC LIMIT 8");
+$productResult = mysqli_query($conn, "
+    SELECT p.id, p.name, p.brand, p.category, p.price, p.stock, p.image, p.description,
+           COALESCE(SUM(oi.quantity), 0) AS sold_qty
+    FROM products p
+    LEFT JOIN order_items oi ON p.id = oi.product_id
+    WHERE p.stock > 0
+    GROUP BY p.id, p.name, p.brand, p.category, p.price, p.stock, p.image, p.description
+    ORDER BY sold_qty DESC, p.id DESC
+    LIMIT 4
+");
 if ($productResult) {
     while ($row = mysqli_fetch_assoc($productResult)) {
         $productRows[] = [
@@ -14,7 +23,8 @@ if ($productResult) {
             "price" => (float)$row["price"],
             "stock" => (int)$row["stock"],
             "image" => $row["image"],
-            "desc" => $row["description"]
+            "desc" => $row["description"],
+            "sold" => (int)$row["sold_qty"]
         ];
     }
 }
@@ -27,7 +37,7 @@ if ($productResult) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SolarMart | Renewable Energy Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260704_reviews">
 </head>
 
 <body>
@@ -113,7 +123,7 @@ if ($productResult) {
 
 <section id="product1" class="section-p1">
     <h2>Featured Solar Products</h2>
-    <p>Reliable renewable energy products for homes, farms and businesses.</p>
+    <p>Top 4 highest sold renewable energy products for homes, farms and businesses.</p>
     <div class="pro-container" id="product-list"></div>
 </section>
 
@@ -140,6 +150,6 @@ if ($productResult) {
 <script>
 window.SOLAR_PRODUCTS = <?php echo json_encode($productRows, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 </script>
-<script src="script.js"></script>
+<script src="script.js?v=20260704_reviews"></script>
 </body>
 </html>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About | SolarMart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260704_reviews">
 </head>
 <body>
 <?php renderHeader('about'); ?>
@@ -31,6 +31,6 @@
     <div class="card"><h3><i class="fa fa-user-shield"></i> Admin Ready</h3><p>Admin can manage products, orders, customers and stock.</p></div>
 </section>
 <?php renderFooter(); ?>
-<script src="script.js"></script>
+<script src="script.js?v=20260704_reviews"></script>
 </body>
 </html>

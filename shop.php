@@ -4,11 +4,7 @@ include "db.php";
 
 $productRows = [];
 
-$hasActiveColumn = false;
-$activeCheck = mysqli_query($conn, "SHOW COLUMNS FROM products LIKE 'is_active'");
-if ($activeCheck && mysqli_num_rows($activeCheck) > 0) { $hasActiveColumn = true; }
-$activeWhere = $hasActiveColumn ? " AND is_active = 1" : "";
-$productResult = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products WHERE stock > 0 $activeWhere ORDER BY id DESC");
+$productResult = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products ORDER BY id DESC");
 
 if ($productResult) {
     while ($row = mysqli_fetch_assoc($productResult)) {
@@ -32,7 +28,7 @@ if ($productResult) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop | SolarMart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260704_reviews">
 </head>
 <body>
 
@@ -74,6 +70,7 @@ if ($productResult) {
         </div>
 
         <div class="pro-container" id="product-list"></div>
+        <div class="product-pagination" id="productPagination"></div>
     </section>
 
     <section id="newsletter" class="section-p1 section-m1">
@@ -89,6 +86,6 @@ if ($productResult) {
     <script>
         window.SOLAR_PRODUCTS = <?php echo json_encode($productRows, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
     </script>
-    <script src="script.js"></script>
+    <script src="script.js?v=20260704_reviews"></script>
 </body>
 </html>
