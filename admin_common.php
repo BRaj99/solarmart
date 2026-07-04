@@ -10,12 +10,65 @@ function clean($value) {
     return trim($value ?? "");
 }
 
+function isAdminUser() {
+    return isset($_SESSION['user_id']) && (($_SESSION['user_role'] ?? '') === 'admin');
+}
+
+if (!isAdminUser()) {
+    $_SESSION['login_notice'] = 'Please login with an admin account to access the admin panel.';
+    header('Location: admin_login.php');
+    exit();
+}
+
+function csrfToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function csrfField() {
+    echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrfToken()) . '">';
+}
+
+function verifyCsrfToken() {
+    $posted = $_POST['csrf_token'] ?? '';
+    return is_string($posted) && hash_equals($_SESSION['csrf_token'] ?? '', $posted);
+}
+
+function tableExistsSafe($conn, $tableName) {
+    if (!$conn) return false;
+    $tableName = mysqli_real_escape_string($conn, $tableName);
+    $result = mysqli_query($conn, "SHOW TABLES LIKE '$tableName'");
+    return $result && mysqli_num_rows($result) > 0;
+}
+
+function ensureColumn($conn, $table, $column, $definition) {
+    $tableSafe = mysqli_real_escape_string($conn, $table);
+    $columnSafe = mysqli_real_escape_string($conn, $column);
+    $check = mysqli_query($conn, "SHOW COLUMNS FROM `$tableSafe` LIKE '$columnSafe'");
+    if ($check && mysqli_num_rows($check) === 0) {
+        mysqli_query($conn, "ALTER TABLE `$tableSafe` ADD COLUMN $definition");
+    }
+}
+
 
 // Creates the stock log table automatically if it is missing.
 
 $columnCheck = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'invoice_sent_at'");
 if ($columnCheck && mysqli_num_rows($columnCheck) === 0) {
     mysqli_query($conn, "ALTER TABLE orders ADD COLUMN invoice_sent_at TIMESTAMP NULL DEFAULT NULL");
+}
+
+if (tableExistsSafe($conn ?? null, 'products')) {
+    ensureColumn($conn, 'products', 'is_active', '`is_active` TINYINT(1) NOT NULL DEFAULT 1');
+    ensureColumn($conn, 'products', 'low_stock_limit', '`low_stock_limit` INT NOT NULL DEFAULT 5');
+}
+if (tableExistsSafe($conn ?? null, 'orders')) {
+    ensureColumn($conn, 'orders', 'updated_at', '`updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP');
+}
+if (tableExistsSafe($conn ?? null, 'users')) {
+    ensureColumn($conn, 'users', 'created_at', '`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
 }
 
 mysqli_query($conn, "CREATE TABLE IF NOT EXISTS stock_logs (
@@ -271,7 +324,10 @@ function uploadProductImage($fileInputName, $oldImage = "") {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $action = $_POST['action'] ?? "";
+    if (!verifyCsrfToken()) {
+        $error = "Security token expired. Please refresh and try again.";
+    }
+    $action = $error === "" ? ($_POST['action'] ?? "") : "";
 
     if ($action === "add") {
         $name = clean($_POST['name']);
@@ -281,13 +337,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stock = (int) ($_POST['stock'] ?? 0);
         $sku = clean($_POST['sku']);
         $description = clean($_POST['description']);
+        $lowStockLimit = max(0, (int)($_POST['low_stock_limit'] ?? 5));
+        $isActive = 1;
         $image = uploadProductImage('image');
 
         if ($name === "" || $category === "" || $price <= 0 || $sku === "") {
             $error = "Please fill product name, category, price, and SKU.";
         } else {
-            $stmt = mysqli_prepare($conn, "INSERT INTO products (name, brand, category, price, stock, sku, image, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            mysqli_stmt_bind_param($stmt, "sssdisss", $name, $brand, $category, $price, $stock, $sku, $image, $description);
+            $stmt = mysqli_prepare($conn, "INSERT INTO products (name, brand, category, price, stock, sku, image, description, low_stock_limit, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt, "sssdisssii", $name, $brand, $category, $price, $stock, $sku, $image, $description, $lowStockLimit, $isActive);
             $message = mysqli_stmt_execute($stmt) ? "Product added successfully." : "Could not add product. SKU may already exist.";
         }
     }
@@ -301,14 +359,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stock = (int) ($_POST['stock'] ?? 0);
         $sku = clean($_POST['sku']);
         $description = clean($_POST['description']);
+        $lowStockLimit = max(0, (int)($_POST['low_stock_limit'] ?? 5));
+        $isActive = 1;
         $oldImage = clean($_POST['old_image']);
         $image = uploadProductImage('image', $oldImage);
 
         if ($id <= 0 || $name === "" || $category === "" || $price <= 0 || $sku === "") {
             $error = "Please fill product name, category, price, and SKU.";
         } else {
-            $stmt = mysqli_prepare($conn, "UPDATE products SET name=?, brand=?, category=?, price=?, stock=?, sku=?, image=?, description=? WHERE id=?");
-            mysqli_stmt_bind_param($stmt, "sssdisssi", $name, $brand, $category, $price, $stock, $sku, $image, $description, $id);
+            $stmt = mysqli_prepare($conn, "UPDATE products SET name=?, brand=?, category=?, price=?, stock=?, sku=?, image=?, description=?, low_stock_limit=?, is_active=? WHERE id=?");
+            mysqli_stmt_bind_param($stmt, "sssdisssiii", $name, $brand, $category, $price, $stock, $sku, $image, $description, $lowStockLimit, $isActive, $id);
             $message = mysqli_stmt_execute($stmt) ? "Product updated successfully." : "Could not update product.";
         }
     }
@@ -525,7 +585,7 @@ function singleValue($conn, $sql, $default = 0) {
 
 $products = tableExists($conn, "products") ? mysqli_query($conn, "SELECT * FROM products ORDER BY id DESC") : false;
 $totalProducts = tableExists($conn, "products") ? singleValue($conn, "SELECT COUNT(*) AS total FROM products") : 0;
-$lowStock = tableExists($conn, "products") ? singleValue($conn, "SELECT COUNT(*) AS total FROM products WHERE stock <= 5") : 0;
+$lowStock = tableExists($conn, "products") ? singleValue($conn, "SELECT COUNT(*) AS total FROM products WHERE stock <= COALESCE(low_stock_limit,5)") : 0;
 $totalStockValue = tableExists($conn, "products") ? singleValue($conn, "SELECT COALESCE(SUM(price * stock),0) AS total FROM products") : 0;
 
 $customerWhere = "1=1";

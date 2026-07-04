@@ -123,6 +123,8 @@ CREATE TABLE `products` (
   `sku` varchar(80) NOT NULL,
   `image` varchar(255) DEFAULT 'images/solar-placeholder.svg',
   `description` text DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `low_stock_limit` int(11) NOT NULL DEFAULT 5,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -131,15 +133,15 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `brand`, `category`, `price`, `stock`, `sku`, `image`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'Mono Solar Panel 550W', 'SunPeak', 'Panels', 28500.00, 16, 'SP-550', 'images/mono-solar-panel.svg', 'High efficiency mono panel for home and commercial rooftop systems.', '2026-05-18 11:31:01', '2026-05-26 06:40:19'),
-(2, 'Hybrid Solar Inverter 5kW', 'VoltEdge', 'Inverters', 125000.00, 7, 'INV-5KW', 'images/hybrid-solar-inverter.svg', 'Smart hybrid inverter with battery support and LCD monitoring.', '2026-05-18 11:31:01', '2026-05-18 11:31:01'),
-(3, 'Lithium Battery 48V 100Ah', 'PowerCell', 'Batteries', 185000.00, 2, 'BAT-48V100', 'images/lithium-battery.svg', 'Long-life lithium storage for backup and off-grid power.', '2026-05-18 11:31:01', '2026-05-25 17:06:51'),
-(4, 'Solar Street Light 120W', 'BrightWay', 'Lights', 24500.00, 23, 'LIGHT-120W', 'images/solar-street-light.svg', 'Automatic dusk-to-dawn outdoor lighting with motion sensor.', '2026-05-18 11:31:01', '2026-05-26 06:40:39'),
-(5, 'Solar Charge Controller MPPT', 'ChargePro', 'Accessories', 16500.00, 12, 'MPPT-CTRL', 'images/solar-charge-controller.svg', 'MPPT controller to improve charging efficiency and battery safety.', '2026-05-18 11:31:01', '2026-05-26 06:32:19'),
-(6, 'Solar Water Pump Kit', 'AquaSun', 'Kits', 92000.00, 6, 'PUMP-KIT', 'images/solar-water-pump-kit.svg', 'Reliable irrigation and water supply kit powered directly by sunlight.', '2026-05-18 11:31:01', '2026-05-18 11:31:01'),
-(7, 'Home Solar Kit 3kW', 'EcoHome', 'Kits', 275000.00, 5, 'HOME-3KW', 'images/home-solar-kit.svg', 'Complete rooftop package for small family homes.', '2026-05-18 11:31:01', '2026-06-29 15:38:43'),
-(8, 'Solar Cable 6mm Bundle', 'SafeWire', 'Accessories', 8500.00, 39, 'CABLE-6MM', 'images/solar-cable-bundle.svg', 'UV-resistant solar cable bundle for safer installation.', '2026-05-18 11:31:01', '2026-06-29 15:38:43');
+INSERT INTO `products` (`id`, `name`, `brand`, `category`, `price`, `stock`, `sku`, `image`, `description`, `is_active`, `low_stock_limit`, `created_at`, `updated_at`) VALUES
+(1, 'Mono Solar Panel 550W', 'SunPeak', 'Panels', 28500.00, 16, 'SP-550', 'images/mono-solar-panel.svg', 'High efficiency mono panel for home and commercial rooftop systems.', 1, 5, '2026-05-18 11:31:01', '2026-05-26 06:40:19'),
+(2, 'Hybrid Solar Inverter 5kW', 'VoltEdge', 'Inverters', 125000.00, 7, 'INV-5KW', 'images/hybrid-solar-inverter.svg', 'Smart hybrid inverter with battery support and LCD monitoring.', 1, 5, '2026-05-18 11:31:01', '2026-05-18 11:31:01'),
+(3, 'Lithium Battery 48V 100Ah', 'PowerCell', 'Batteries', 185000.00, 2, 'BAT-48V100', 'images/lithium-battery.svg', 'Long-life lithium storage for backup and off-grid power.', 1, 5, '2026-05-18 11:31:01', '2026-05-25 17:06:51'),
+(4, 'Solar Street Light 120W', 'BrightWay', 'Lights', 24500.00, 23, 'LIGHT-120W', 'images/solar-street-light.svg', 'Automatic dusk-to-dawn outdoor lighting with motion sensor.', 1, 5, '2026-05-18 11:31:01', '2026-05-26 06:40:39'),
+(5, 'Solar Charge Controller MPPT', 'ChargePro', 'Accessories', 16500.00, 12, 'MPPT-CTRL', 'images/solar-charge-controller.svg', 'MPPT controller to improve charging efficiency and battery safety.', 1, 5, '2026-05-18 11:31:01', '2026-05-26 06:32:19'),
+(6, 'Solar Water Pump Kit', 'AquaSun', 'Kits', 92000.00, 6, 'PUMP-KIT', 'images/solar-water-pump-kit.svg', 'Reliable irrigation and water supply kit powered directly by sunlight.', 1, 5, '2026-05-18 11:31:01', '2026-05-18 11:31:01'),
+(7, 'Home Solar Kit 3kW', 'EcoHome', 'Kits', 275000.00, 5, 'HOME-3KW', 'images/home-solar-kit.svg', 'Complete rooftop package for small family homes.', 1, 5, '2026-05-18 11:31:01', '2026-06-29 15:38:43'),
+(8, 'Solar Cable 6mm Bundle', 'SafeWire', 'Accessories', 8500.00, 39, 'CABLE-6MM', 'images/solar-cable-bundle.svg', 'UV-resistant solar cable bundle for safer installation.', 1, 5, '2026-05-18 11:31:01', '2026-06-29 15:38:43');
 
 -- --------------------------------------------------------
 
@@ -181,16 +183,17 @@ CREATE TABLE `users` (
   `age` int(11) DEFAULT NULL,
   `gender` varchar(20) DEFAULT NULL,
   `location` varchar(150) DEFAULT NULL,
-  `address` text DEFAULT NULL
+  `address` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `reset_token`, `reset_expires`, `phone`, `age`, `gender`, `location`, `address`) VALUES
-(3, 'biraj basaula', 'birajbasaula110@gmail.com', '$2y$10$Q5dpBMeloe94FmcqvTQrXurldvryuyH7QLnoQRNIakIVUYPvcOHfK', 'customer', NULL, NULL, '9874102111', 20, 'Male', 'chabahil', 'kuti galli house no.12'),
-(4, 'himal', 'himal123@gmail.com', '$2y$10$5Xahwp25NVhBWFMLxny.gOSJ.aSbbX.epsCzRFUA876uVj4pYj55e', 'customer', NULL, NULL, '123456789', 20, 'Male', 'kathmandu', 'house number 11');
+INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `reset_token`, `reset_expires`, `phone`, `age`, `gender`, `location`, `address`, `created_at`) VALUES
+(3, 'biraj basaula', 'birajbasaula110@gmail.com', '$2y$10$Q5dpBMeloe94FmcqvTQrXurldvryuyH7QLnoQRNIakIVUYPvcOHfK', 'customer', NULL, NULL, '9874102111', 20, 'Male', 'chabahil', 'kuti galli house no.12', current_timestamp()),
+(4, 'himal', 'himal123@gmail.com', '$2y$10$5Xahwp25NVhBWFMLxny.gOSJ.aSbbX.epsCzRFUA876uVj4pYj55e', 'customer', NULL, NULL, '123456789', 20, 'Male', 'kathmandu', 'house number 11', current_timestamp());
 
 --
 -- Indexes for dumped tables
@@ -208,7 +211,9 @@ ALTER TABLE `contact_messages`
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `order_number` (`order_number`),
-  ADD KEY `fk_orders_user` (`user_id`);
+  ADD KEY `fk_orders_user` (`user_id`),
+  ADD KEY `idx_orders_status` (`status`),
+  ADD KEY `idx_orders_created_at` (`created_at`);
 
 --
 -- Indexes for table `order_items`
@@ -223,7 +228,9 @@ ALTER TABLE `order_items`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_sku` (`sku`);
+  ADD UNIQUE KEY `unique_sku` (`sku`),
+  ADD KEY `idx_products_category` (`category`),
+  ADD KEY `idx_products_active` (`is_active`);
 
 --
 -- Indexes for table `stock_logs`

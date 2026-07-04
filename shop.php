@@ -4,7 +4,11 @@ include "db.php";
 
 $productRows = [];
 
-$productResult = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products WHERE stock > 0 ORDER BY id DESC");
+$hasActiveColumn = false;
+$activeCheck = mysqli_query($conn, "SHOW COLUMNS FROM products LIKE 'is_active'");
+if ($activeCheck && mysqli_num_rows($activeCheck) > 0) { $hasActiveColumn = true; }
+$activeWhere = $hasActiveColumn ? " AND is_active = 1" : "";
+$productResult = mysqli_query($conn, "SELECT id, name, brand, category, price, stock, image, description FROM products WHERE stock > 0 $activeWhere ORDER BY id DESC");
 
 if ($productResult) {
     while ($row = mysqli_fetch_assoc($productResult)) {
@@ -56,10 +60,16 @@ if ($productResult) {
                 <option>Accessories</option>
             </select>
 
+            <select id="stockFilter">
+                <option value="in">In stock only</option>
+                <option value="all">Show all</option>
+            </select>
+
             <select id="sortProducts">
-                <option value="default">Sort: Featured</option>
+                <option value="default">Sort: Newest</option>
                 <option value="low">Price: Low to High</option>
                 <option value="high">Price: High to Low</option>
+                <option value="name">Name: A to Z</option>
             </select>
         </div>
 

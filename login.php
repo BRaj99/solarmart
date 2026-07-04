@@ -19,7 +19,7 @@ $showSignup = false;
 $showOtp = false;
 
 $next = $_GET["next"] ?? ($_POST["next"] ?? "index.php");
-$allowedNext = ["checkout.php", "cart.php", "index.php", "shop.php"];
+$allowedNext = ["checkout.php", "cart.php", "index.php", "shop.php", "admin.php", "admin_products.php", "admin_orders.php", "admin_stock.php", "admin_customers.php"];
 if (!in_array($next, $allowedNext)) { $next = "index.php"; }
 
 $loginNotice = $_SESSION["login_notice"] ?? "";
@@ -41,6 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     if (mysqli_num_rows($result) > 0) {
         $user = mysqli_fetch_assoc($result);
         if (password_verify($password, $user['password'])) {
+            if (($user['role'] ?? 'customer') === 'admin') {
+                $error = "Please use the separate Admin Login page.";
+            } else {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['fullname'];
             $_SESSION['user_email'] = $user['email'];
@@ -49,8 +52,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             $_SESSION['user_gender'] = $user['gender'];
             $_SESSION['user_location'] = $user['location'];
             $_SESSION['user_address'] = $user['address'];
+            $_SESSION['user_role'] = $user['role'] ?? 'customer';
             header("Location: " . $next);
             exit();
+            }
         } else {
             $error = "Incorrect password";
         }

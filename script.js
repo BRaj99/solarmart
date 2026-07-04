@@ -107,17 +107,31 @@ function initShop() {
   const search = document.querySelector('#searchProducts');
   const category = document.querySelector('#categoryFilter');
   const sort = document.querySelector('#sortProducts');
+  const stock = document.querySelector('#stockFilter');
   const apply = () => {
     let list = [...products];
-    const term = (search?.value || '').toLowerCase();
+    const term = (search?.value || '').toLowerCase().trim();
     const cat = category?.value || 'All';
-    if (term) list = list.filter(p => `${p.name} ${p.brand} ${p.category} ${p.desc || ''}`.toLowerCase().includes(term));
-    if (cat !== 'All') list = list.filter(p => p.category === cat);
+
+    if (term) {
+      list = list.filter(p => `${p.name} ${p.brand} ${p.category} ${p.desc || ''}`.toLowerCase().includes(term));
+    }
+
+    if (cat !== 'All') {
+      list = list.filter(p => p.category === cat);
+    }
+
+    if (stock?.value === 'in') {
+      list = list.filter(p => Number(p.stock) > 0);
+    }
+
     if (sort?.value === 'low') list.sort((a, b) => Number(a.price) - Number(b.price));
     if (sort?.value === 'high') list.sort((a, b) => Number(b.price) - Number(a.price));
+    if (sort?.value === 'name') list.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+
     renderProducts(list, '#product-list');
   };
-  [search, category, sort].forEach(el => el && el.addEventListener('input', apply));
+  [search, category, stock, sort].forEach(el => el && el.addEventListener('input', apply));
 }
 
 function renderCart() {

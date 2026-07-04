@@ -244,6 +244,44 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Match stock add/update and filter controls with the product add/update UI */
+.stock-card .admin-form {
+    margin: 0;
+    background: #fbfffc;
+    border: 1px solid var(--line, #d8e8dc);
+    border-radius: 0 0 22px 22px;
+    box-shadow: none;
+}
+.stock-form-body.admin-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 15px;
+    padding: 18px;
+}
+.stock-form-body.admin-form .field {
+    margin-bottom: 0;
+}
+.stock-form-body.admin-form .field label,
+.report-filter-bar.admin-form .filter-label {
+    color: var(--deep, #0f3324);
+    font-weight: 900;
+    font-size: 12px;
+}
+.stock-submit-row {
+    grid-column: 1 / -1;
+}
+.report-filter-bar.admin-form {
+    display: block;
+    padding: 18px;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+}
+.report-filter-bar.admin-form .filter-grid {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
 </style>
 
 <div class="stock-page-head">
@@ -285,8 +323,9 @@
             <p><?php echo $editStock ? "Update the selected bill-wise stock record." : "Add stock with product, quantity, Nepali date, and bill number."; ?></p>
         </div>
 
-        <form class="stock-form-body" method="POST" action="admin_stock.php">
+        <form class="admin-form stock-form-body" method="POST" action="admin_stock.php">
             <input type="hidden" name="action" value="<?php echo $editStock ? 'update_stock_log' : 'add_stock'; ?>">
+            <?php csrfField(); ?>
             <?php if ($editStock): ?>
                 <input type="hidden" name="log_id" value="<?php echo (int)$editStock['id']; ?>">
             <?php endif; ?>
@@ -343,7 +382,7 @@
             <p>Use Nepali fiscal year or custom Nepali date range to view stock history.</p>
         </div>
 
-        <form class="report-filter-bar" method="GET" action="admin_stock.php">
+        <form class="admin-form report-filter-bar" method="GET" action="admin_stock.php">
             <div class="filter-grid">
                 <div>
                     <label class="filter-label">Nepali Fiscal Year</label>

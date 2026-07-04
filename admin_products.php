@@ -8,6 +8,7 @@
     <h3><?php echo $editProduct ? "Edit Product" : "Add New Product"; ?></h3>
     <form class="admin-form" method="POST" enctype="multipart/form-data" action="admin_products.php">
         <input type="hidden" name="action" value="<?php echo $editProduct ? 'update' : 'add'; ?>">
+        <?php csrfField(); ?>
         <?php if ($editProduct): ?>
             <input type="hidden" name="id" value="<?php echo (int)$editProduct['id']; ?>">
             <input type="hidden" name="old_image" value="<?php echo htmlspecialchars($editProduct['image']); ?>">
@@ -16,7 +17,7 @@
         <input type="text" name="brand" placeholder="Brand" value="<?php echo htmlspecialchars($editProduct['brand'] ?? ''); ?>">
         <select name="category" required>
             <?php
-            $categories = ['Panels', 'Inverters', 'Batteries', 'Lights', 'Kits', 'Accessories'];
+            $categories = ['Panels', 'Inverters', 'Batteries', 'Lights', 'Kits', 'Accessories', 'Water Heater'];
             $selectedCategory = $editProduct['category'] ?? '';
             echo '<option value="">Select Category</option>';
             foreach ($categories as $cat) {
@@ -27,6 +28,7 @@
         </select>
         <input type="number" step="0.01" name="price" placeholder="Price" required value="<?php echo htmlspecialchars($editProduct['price'] ?? ''); ?>">
         <input type="number" name="stock" placeholder="Stock Quantity" required value="<?php echo htmlspecialchars($editProduct['stock'] ?? ''); ?>">
+        <input type="number" name="low_stock_limit" min="0" placeholder="Low Stock Alert Limit" value="<?php echo htmlspecialchars($editProduct['low_stock_limit'] ?? 5); ?>">
         <input type="text" name="sku" placeholder="SKU Code" required value="<?php echo htmlspecialchars($editProduct['sku'] ?? ''); ?>">
         <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,.svg">
         <textarea name="description" placeholder="Product Description"><?php echo htmlspecialchars($editProduct['description'] ?? ''); ?></textarea>
@@ -40,7 +42,7 @@
     <h3>Manage Products</h3>
     <div class="table-wrap">
         <table class="cart-table">
-            <thead><tr><th>Image</th><th>Name</th><th>Description</th><th>Category</th><th>Price</th><th>Stock</th><th>SKU</th><th>Action</th></tr></thead>
+            <thead><tr><th>Image</th><th>Name</th><th>Description</th><th>Category</th><th>Price</th><th>Stock</th><th>Low Alert</th><th>SKU</th><th>Action</th></tr></thead>
             <tbody>
             <?php if (mysqli_num_rows($products) > 0): ?>
                 <?php while ($product = mysqli_fetch_assoc($products)): ?>
@@ -51,11 +53,13 @@
                         <td><?php echo htmlspecialchars($product['category']); ?></td>
                         <td>Rs <?php echo number_format($product['price']); ?></td>
                         <td><?php echo (int)$product['stock']; ?></td>
+                        <td><?php echo (int)($product['low_stock_limit'] ?? 5); ?></td>
                         <td><?php echo htmlspecialchars($product['sku']); ?></td>
                         <td>
                             <a class="small-btn edit-btn" href="admin_products.php?edit=<?php echo (int)$product['id']; ?>">Edit</a>
                             <form method="POST" action="admin_products.php" style="display:inline" onsubmit="return confirm('Delete this product?');">
                                 <input type="hidden" name="action" value="delete">
+                                <?php csrfField(); ?>
                                 <input type="hidden" name="id" value="<?php echo (int)$product['id']; ?>">
                                 <button type="submit" class="small-btn delete-btn">Delete</button>
                             </form>
@@ -63,7 +67,7 @@
                     </tr>
                 <?php endwhile; ?>
             <?php else: ?>
-                <tr><td colspan="7">No products found. Add your first product above.</td></tr>
+                <tr><td colspan="9">No products found. Add your first product above.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
